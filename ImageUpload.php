@@ -18,13 +18,19 @@ class ImageUpload extends CComponent {
     public $pathOfMark = '/images/';
     public $path;
     public $threshold = 100;
+    /**
+     *
+     * @var String folder  
+     */
     public $folder = "Y-m-d";
-//    array(
-//        array('label' => '_L', 'width' => 610, "height" => 400),
-//        array('label' => '_M', 'width' => 300, "height" => 250),
-//        array('label' => '_T', 'width' => 120, "height" => 90),
-//    );
 
+    /**
+     * array(
+     *   array('label' => '_L', 'width' => 610, "height" => 400),
+     *   array('label' => '_M', 'width' => 300, "height" => 250),
+     *   array('label' => '_T', 'width' => 120, "height" => 90),
+     * );
+     */
     public $labels;
     public $oLabel = '_O';
     public $width = 900;
@@ -35,6 +41,12 @@ class ImageUpload extends CComponent {
         //   $this->image = new ImageClass();
     }
 
+    /**
+     * change destination directori to date path
+     * 
+     * @param String dest 
+     * @param bool mkdir
+     */
     public function initDestination($dest, $mkdir = true) {
 //        $dest = $dest . '/' . date($this->folder);
 //        if (!file_exists($dest) && $mkdir) {
@@ -43,6 +55,13 @@ class ImageUpload extends CComponent {
         return $dest . '/';
     }
 
+    /**
+     * start to resize and crop image
+     *
+     * @param type $filename
+     * @param type $destination
+     * @return boolean 
+     */
     public function save($filename, $destination) {
         if (!file_exists($filename))
             return false;
