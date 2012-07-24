@@ -114,6 +114,9 @@ class ImageClass {
                 $blTmp = imagecolorallocatealpha($this->image, 0x00,0x00,0x00,127); 
                 imagefill($this->image, 0, 0, $blTmp); 
                 //imagecolortransparent($this->image, $blTmp);
+            }else{
+                $white = ImageColorAllocate($this->image, 255, 255, 255);
+                ImageFillToBorder($this->image, 0, 0, $white, $white);
             }
             imagecopyresampled($this->image, $created, 0, 0, 0, 0, $width, $height, $source_width, $source_height);
             imagedestroy($created);
@@ -232,6 +235,9 @@ class ImageClass {
                 $blTmp = imagecolorallocatealpha($this->image, 0x00,0x00,0x00,127); 
                 imagefill($this->image, 0, 0, $blTmp); 
                 //imagecolortransparent($this->image, $blTmp);
+            }else{
+                $white = ImageColorAllocate($this->image, 255, 255, 255);
+                ImageFillToBorder($this->image, 0, 0, $white, $white);
             }
             imagecopy($this->image, $created, 0, 0, $x, $y, $width, $height);
             imagedestroy($created);
