@@ -113,7 +113,6 @@ class ImageClass {
             if ($this->source["type"] == 'image/gif' || $this->source["type"] == 'image/png') {
                 $blTmp = imagecolorallocatealpha($this->image, 0x00,0x00,0x00,127); 
                 imagefill($this->image, 0, 0, $blTmp); 
-                //imagecolortransparent($this->image, $blTmp);
             }else{
                 $white = ImageColorAllocate($this->image, 255, 255, 255);
                 ImageFillToBorder($this->image, 0, 0, $white, $white);
@@ -161,7 +160,6 @@ class ImageClass {
             imagesavealpha($tmp, true); 
             $blTmp = imagecolorallocatealpha($tmp, 0x00,0x00,0x00,127); 
             imagefill($tmp, 0, 0, $blTmp); 
-            //imagecolortransparent($tmp, $blTmp);
             imagecopyresampled($tmp, $watermark, 0, 0, 0, 0, $watermark_width, $watermark_height, $watermark_width, $watermark_height);
             imagedestroy($watermark);
             $watermark = $tmp;
