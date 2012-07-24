@@ -109,16 +109,17 @@ class ImageClass {
                     break;
             }
             $this->image = imagecreatetruecolor($width, $height);
-            imagesavealpha($this->image, true); 
+            imagesavealpha($this->image, true);
             if ($this->source["type"] == 'image/gif' || $this->source["type"] == 'image/png') {
-                $blTmp = imagecolorallocatealpha($this->image, 0x00,0x00,0x00,127); 
-                imagefill($this->image, 0, 0, $blTmp); 
-            }else{
+                $blTmp = imagecolorallocatealpha($this->image, 0x00, 0x00, 0x00, 127);
+                imagefill($this->image, 0, 0, $blTmp);
+            } else {
                 $white = ImageColorAllocate($this->image, 255, 255, 255);
                 ImageFillToBorder($this->image, 0, 0, $white, $white);
             }
             imagecopyresampled($this->image, $created, 0, 0, 0, 0, $width, $height, $source_width, $source_height);
             imagedestroy($created);
+            
         }
     }
 
@@ -157,9 +158,9 @@ class ImageClass {
 
             list($watermark_width, $watermark_height) = getimagesize($mark);
             $tmp = imagecreatetruecolor($watermark_width, $watermark_height);
-            imagesavealpha($tmp, true); 
-            $blTmp = imagecolorallocatealpha($tmp, 0x00,0x00,0x00,127); 
-            imagefill($tmp, 0, 0, $blTmp); 
+            imagesavealpha($tmp, true);
+            $blTmp = imagecolorallocatealpha($tmp, 0x00, 0x00, 0x00, 127);
+            imagefill($tmp, 0, 0, $blTmp);
             imagecopyresampled($tmp, $watermark, 0, 0, 0, 0, $watermark_width, $watermark_height, $watermark_width, $watermark_height);
             imagedestroy($watermark);
             $watermark = $tmp;
@@ -215,8 +216,9 @@ class ImageClass {
      * @param int $width
      * @param int $height
      */
-    public function crop($x, $y, $width, $height) {
-        if (isset($this->source["tmp_name"]) && file_exists($this->source["tmp_name"]) && ($width > 10) && ($height > 10)) {
+    public function crop($desireWidth, $desireHeight, $source_width, $source_height) {
+        if (isset($this->source["tmp_name"]) && file_exists($this->source["tmp_name"])) {
+            
             switch ($this->source["type"]) {
                 case "image/jpeg" : $created = imagecreatefromjpeg($this->source["tmp_name"]);
                     break;
@@ -225,20 +227,54 @@ class ImageClass {
                 case "image/png" : $created = imagecreatefrompng($this->source["tmp_name"]);
                     break;
             }
-            
-           
-            $this->image = imagecreatetruecolor($width, $height);
-            imagesavealpha($this->image, true); 
+
+            $source_aspect_ratio = $source_width / $source_height;
+            $desired_aspect_ratio = $desireWidth / $desireHeight;
+
+            if ($source_aspect_ratio > $desired_aspect_ratio) {
+                // Triggered when source image is wider
+                $temp_height = $desireHeight;
+                $temp_width = (int) ( $desireHeight * $source_aspect_ratio );
+            } else {
+                // Triggered otherwise (i.e. source image is similar or taller)
+                $temp_width = $desireWidth;
+                $temp_height = (int) ( $desireWidth / $source_aspect_ratio );
+            }
+            // Resize the image into a temporary GD image
+            $temp_gdim = imagecreatetruecolor($temp_width, $temp_height);
+            imagesavealpha( $temp_gdim , true);
             if ($this->source["type"] == 'image/gif' || $this->source["type"] == 'image/png') {
-                $blTmp = imagecolorallocatealpha($this->image, 0x00,0x00,0x00,127); 
-                imagefill($this->image, 0, 0, $blTmp); 
-                //imagecolortransparent($this->image, $blTmp);
-            }else{
+                $blTmp = imagecolorallocatealpha($temp_gdim, 0x00, 0x00, 0x00, 127);
+                imagefill($temp_gdim, 0, 0, $blTmp);
+            } else {
+                $white = ImageColorAllocate($temp_gdim, 255, 255, 255);
+                ImageFillToBorder($temp_gdim, 0, 0, $white, $white);
+            }
+            imagecopyresampled(
+                    $temp_gdim, $created, 0, 0, 0, 0, $temp_width, $temp_height, $source_width, $source_height
+            );
+            imagedestroy($created);
+
+            // Copy cropped region from temporary image into the desired GD image
+
+            $x0 = ( $temp_width - $desireWidth ) / 2;
+            $y0 = ( $temp_height - $desireHeight ) / 2;
+
+            $this->image = imagecreatetruecolor($desireWidth, $desireHeight);
+            
+            imagesavealpha($this->image, true);
+            if ($this->source["type"] == 'image/gif' || $this->source["type"] == 'image/png') {
+                $blTmp = imagecolorallocatealpha($this->image, 0x00, 0x00, 0x00, 127);
+                imagefill($this->image, 0, 0, $blTmp);
+            } else {
                 $white = ImageColorAllocate($this->image, 255, 255, 255);
                 ImageFillToBorder($this->image, 0, 0, $white, $white);
             }
-            imagecopy($this->image, $created, 0, 0, $x, $y, $width, $height);
-            imagedestroy($created);
+            imagecopy($this->image, $temp_gdim, 0, 0, $x0, $y0, $desireWidth, $desireHeight);
+            imagedestroy($temp_gdim);
+            
+            // Render the image
+            // Alternatively, you can save the image in file-system or database
         }
     }
 

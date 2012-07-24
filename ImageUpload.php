@@ -1,6 +1,5 @@
 <?php
 
-
 Yii::import('application.components.images.*');
 
 /**
@@ -15,6 +14,7 @@ class ImageUpload extends CComponent {
     public $pathOfMark = '/images/';
     public $path;
     public $threshold = 100;
+
     /**
      *
      * @var String folder  
@@ -72,18 +72,16 @@ class ImageUpload extends CComponent {
                 $label['zoom'] = true;
             }
             if ($label['zoom']) {
-                list ($width, $height, $x, $y) = $this->calculateWHXY($label);
-                $this->image->crop($x, $y, $width, $height);
+                $this->image->crop($label['width'], $label['height'], $this->width, $this->height);
+            } else{
+                $this->image->resize($label['width'], $label['height']);
             }
-            $this->image->create($dest);
-            $this->image->source($dest);
-            $this->image->resize($label['width'], $label['height']);
             if (isset($label['watermark'])) {
                 $this->image->source($dest);
                 $mark = Yii::getPathOfAlias('webroot') . $this->pathOfMark . $label['watermark'];
                 $this->image->watermark($mark, 60, $label['mark_x'], $label['mark_y']);
             }
-
+            
             if (isset($label['quality']))
                 $this->image->create($dest, $label['quality']);
             else
