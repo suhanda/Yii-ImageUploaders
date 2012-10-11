@@ -132,10 +132,9 @@ class ImageUpload extends CComponent {
     }
 
     public function rename($filename, $label) {
-        $filename = explode('.', $filename);
-        $ext = end($filename);
-        $filename = $filename[0] . $label . '.' . $ext;
-        return $filename;
+        $ext = substr($filename,-3);
+        $filename = substr($filename,0,-4);
+        return ($filename . $label. ".". $ext);
     }
 
     public function getImage() {
